@@ -13,7 +13,7 @@
         android:layout_height="120dp"
         android:background="@android:color/white">
         <ImageView
-            android:id="@+id/ivItemListNotes"
+            android:id="@+id/ivItemListDiary"
             android:layout_width="92dp"
             android:layout_height="92dp"
             tools:src="@drawable/img_cover"
@@ -22,7 +22,7 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"/>
         <TextView
-            android:id="@+id/tvItemListNotesDate"
+            android:id="@+id/tvItemListDiaryDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="26 january 2019"
@@ -30,16 +30,16 @@
             android:layout_marginLeft="12dp"
             android:textColor="#C4C4C4"/>
         <TextView
-            android:id="@+id/tvItemListNotesTitle"
+            android:id="@+id/tvItemListDiaryTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:text="Paradise Lost"
-            android:layout_below="@id/tvItemListNotesDate"
+            android:layout_below="@id/tvItemListDiaryDate"
             android:layout_marginLeft="12dp"
             android:layout_marginTop="4dp"
             android:textSize="24sp"
             android:maxLines="2"
-            android:layout_toLeftOf="@id/ivItemListNotes"
+            android:layout_toLeftOf="@id/ivItemListDiary"
             android:textColor="#000000"
             />
 

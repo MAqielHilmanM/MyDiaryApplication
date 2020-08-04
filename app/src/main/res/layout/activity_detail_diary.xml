@@ -18,6 +18,13 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@android:color/white">
 
+            <TextView
+                android:id="@+id/tvDetailDiaryDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="March 8, 2018"
+                android:textSize="18dp"
+                android:textColor="#222222"/>
 
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
@@ -33,7 +40,7 @@
             android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/ivDetailNotes"
+                android:id="@+id/ivDetailDiary"
                 android:layout_width="match_parent"
                 android:layout_height="182dp"
                 android:scaleType="centerCrop"
@@ -47,7 +54,7 @@
                 android:background="#222222"/>
 
             <TextView
-                android:id="@+id/tvDetailNotesTitle"
+                android:id="@+id/tvDetailDiaryTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -65,7 +72,7 @@
                 android:background="#222222"/>
 
             <TextView
-                android:id="@+id/tvDetailNotesDescription"
+                android:id="@+id/tvDetailDiaryDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="20dp"
