@@ -13,19 +13,25 @@ import motion.kelas.mydiaryapplication.load
 
 class FormDiaryActivity : AppCompatActivity() {
 
+    // variable untuk mengecek apakah edit atau bukan (default nilainya false)
     var isEdit = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_form_diary)
 
+        // memanggil fugnsi berikut ketika activity dibuat
         initToolbar()
         loadData()
         initListener()
     }
 
+
     private fun initListener() {
+        // Ketika tombol Create / Update pada Diary Notes di klik
         btnDiaryNotes.setOnClickListener {
+
+            // Buat model berdasarkan data dari form
             val data = ListDiaryModel(
                 "",
                 etCreateDiaryTitle.text.toString(),
@@ -34,14 +40,17 @@ class FormDiaryActivity : AppCompatActivity() {
                 etCreateDiaryDescription.text.toString()
             )
 
+            // jika form tersebut edit
             if (isEdit) {
+                //berpindah ke Activity Detail Diary
                 val intent = Intent(this, DetailDiaryActivity::class.java)
-                intent.putExtra("model", data)
+                intent.putExtra("model", data) // kirim data ke activity baru
                 startActivity(intent)
                 finish()
             }else {
+                //berpindah ke Activity List Diary
                 val intent = Intent(this, ListDiaryActivity::class.java)
-                intent.putExtra("model", data)
+                intent.putExtra("model", data) // kirim data ke activity baru
                 startActivity(intent)
             }
         }

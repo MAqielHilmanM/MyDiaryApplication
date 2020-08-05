@@ -15,27 +15,27 @@ class ListDiaryAdapter(var list: List<ListDiaryModel>) :
     RecyclerView.Adapter<ListDiaryAdapter.ListDiaryViewHolder>() {
 
 
+    // buat view holder untuk recycler view item
     inner class ListDiaryViewHolder(itemView : View, val context: Context) : RecyclerView.ViewHolder(itemView){
-        init {
-            // TODO : isi constructor
-        }
-
+        // buat fungsi untuk mengambil data dari list dan memasukkannya ke layout
         fun initData(data : ListDiaryModel){
+            // ubah text pada layout sesuai data
             itemView.tvItemListDiaryTitle.text = data.title
             itemView.tvItemListDiaryDate.text = data.date
 
-            //TODO :  gambar menggunakan picasso
+            // untuk file gambar dapat menggunakan picasso
             Picasso.get().load(data.url).centerCrop().into(itemView.ivItemListDiary)
 
+            // tambahkan aksi ketika item/layout di klik
             itemView.setOnClickListener {
-                // TODO : ketika item view di klik
+                // pindah ke activity detail diary
                 val intent = Intent(context, DetailDiaryActivity::class.java)
 //                intent.putExtra("title",data.title)
 //                intent.putExtra("date",data.date)
 //                intent.putExtra("story",data.story)
 //                intent.putExtra("url",data.url)
-                intent.putExtra("model",data)
-                context.startActivity(intent)
+                intent.putExtra("model",data)       // kirimkan data model ke detail diary
+                context.startActivity(intent)              // pindah ke activity baru
             }
 
             // duplicate : ctrl + d
@@ -43,15 +43,18 @@ class ListDiaryAdapter(var list: List<ListDiaryModel>) :
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListDiaryViewHolder {
+        // load item_diary.xml ke dalam view
         val v = LayoutInflater.from(parent.context).inflate(R.layout.item_diary,parent,false)
+        // tambahkan view ke ViewHolder
         return ListDiaryViewHolder(v,parent.context)
     }
 
     override fun getItemCount(): Int {
-        return list.size
+        return list.size    // jum;ah data yang ditampilkan sebanyak isi list
     }
 
     override fun onBindViewHolder(holder: ListDiaryViewHolder, position: Int) {
+        // setiap kali data berubah panggil fungsi pada view holder yaitu initdata()
         holder.initData(list[position])
     }
 }
