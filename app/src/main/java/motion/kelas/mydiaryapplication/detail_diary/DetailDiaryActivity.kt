@@ -10,8 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_detail_diary.*
-import kotlinx.android.synthetic.main.activity_detail_diary.toolbar
-import kotlinx.android.synthetic.main.activity_form_diary.*
 import motion.kelas.mydiaryapplication.R
 import motion.kelas.mydiaryapplication.dao.DiaryDao
 import motion.kelas.mydiaryapplication.form_diary.FormDiaryActivity
@@ -50,10 +48,13 @@ class DetailDiaryActivity : AppCompatActivity() {
             R.id.menuEdit -> {      // Ketika menuEdit di klik (sesuai dgn id di res/menu/menu_detail.xml)
                 val intent = Intent(this, FormDiaryActivity::class.java)
                 intent.putExtra("isEdit", true) // mengirim extra kalau ini tujuannya untuk edit
-                intent.putExtra("model", ListDiaryModel(
-                    id, title, date, url, story
-                )) // mengirim isi data ke form
+                intent.putExtra(
+                    "model", ListDiaryModel(
+                        id, title, date, url, story
+                    )
+                ) // mengirim isi data ke form
                 startActivity(intent) // mulai berpindah activity
+                finish()
                 return true
             }
             R.id.menuDelete -> {    // Ketika menuDelete di klik (sesuai dgn id di res/menu/menu_detail.xml)
@@ -65,13 +66,13 @@ class DetailDiaryActivity : AppCompatActivity() {
                     // aksi ketika tombol ok di klik
 
                     val db = FirebaseFirestore.getInstance()
-                    db.collection("diarys").document("DC")
+                    db.collection("diarys").document(id)
                         .delete()
                         .addOnSuccessListener {
                             finish()
                         }
-                        .addOnFailureListener {
-                                e -> Log.w("Error", "Error deleting document", e)
+                        .addOnFailureListener { e ->
+                            Log.w("Error", "Error deleting document", e)
                         }
                 }
                 builder.setNegativeButton("Cancel") { dialog, which ->

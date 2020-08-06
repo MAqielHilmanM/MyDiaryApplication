@@ -74,7 +74,7 @@ class ListDiaryActivity : AppCompatActivity() {
                         ListDiaryModel(
                             document.id,
                             data?.title ?: "",
-                            data?.date.toString(),
+                            data?.date?.toDate().toString(),
                             data?.url ?: "",
                             data?.story ?: ""
                         )

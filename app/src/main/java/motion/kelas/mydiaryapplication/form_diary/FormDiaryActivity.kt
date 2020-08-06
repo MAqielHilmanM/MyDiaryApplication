@@ -6,13 +6,11 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.Timestamp
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_form_diary.*
 import motion.kelas.mydiaryapplication.R
 import motion.kelas.mydiaryapplication.dao.DiaryDao
 import motion.kelas.mydiaryapplication.detail_diary.DetailDiaryActivity
-import motion.kelas.mydiaryapplication.list_diary.ListDiaryActivity
 import motion.kelas.mydiaryapplication.list_diary.ListDiaryModel
 import motion.kelas.mydiaryapplication.load
 
@@ -21,7 +19,7 @@ class FormDiaryActivity : AppCompatActivity() {
 
     // variable untuk mengecek apakah edit atau bukan (default nilainya false)
     var isEdit = false
-    lateinit var model : ListDiaryModel
+    lateinit var model: ListDiaryModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,36 +36,45 @@ class FormDiaryActivity : AppCompatActivity() {
         // Ketika tombol Create / Update pada Diary Notes di klik
         btnDiaryNotes.setOnClickListener {
 
-            // Buat model berdasarkan data dari form
-            val data = DiaryDao(
-                model.id,
-                Timestamp.now(),
-                etCreateDiaryDescription.text.toString(),
-                etCreateDiaryTitle.text.toString(),
-                model.url
-            )
-
             val db = FirebaseFirestore.getInstance()
 
             // jika form tersebut edit
             if (isEdit) {
+                // Buat model berdasarkan data dari form
+                val data = DiaryDao(
+                    model.id,
+                    Timestamp.now(),
+                    etCreateDiaryDescription.text.toString(),
+                    etCreateDiaryTitle.text.toString(),
+                    model.url
+                )
+
                 db.collection("diarys").document(model.id)
                     .set(data).addOnSuccessListener {
                         //berpindah ke Activity Detail Diary
                         val intent = Intent(this, DetailDiaryActivity::class.java)
-                        intent.putExtra("id",model.id)
+                        intent.putExtra("id", model.id)
                         startActivity(intent)
                         finish()
                     }.addOnFailureListener {
-                        Toast.makeText(this,"Failed change data",Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Failed change data", Toast.LENGTH_SHORT).show()
                     }
 
-            }else {
+            } else {
+                // Buat model berdasarkan data dari form
+                val data = DiaryDao(
+                    "",
+                    Timestamp.now(),
+                    etCreateDiaryDescription.text.toString(),
+                    etCreateDiaryTitle.text.toString(),
+                    "https://www.talonplus.co.th/Mirror%20Effect%20_%20Demo%201%20_%20Codrops_files/1.jpg"
+                )
+
                 val docRec = db.collection("diarys")
                 docRec.add(data).addOnSuccessListener {
                     finish()
                 }.addOnFailureListener {
-                    Toast.makeText(this,"Failed add data",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Failed add data", Toast.LENGTH_SHORT).show()
                 }
             }
         }
