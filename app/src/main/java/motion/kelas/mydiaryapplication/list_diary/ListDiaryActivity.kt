@@ -1,15 +1,18 @@
 package motion.kelas.mydiaryapplication.list_diary
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.activity_form_diary.*
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_list_diary.*
-import kotlinx.android.synthetic.main.activity_list_diary.toolbar
 import motion.kelas.mydiaryapplication.R
+import motion.kelas.mydiaryapplication.dao.DiaryDao
 import motion.kelas.mydiaryapplication.form_diary.FormDiaryActivity
+
 
 class ListDiaryActivity : AppCompatActivity() {
 
@@ -22,32 +25,23 @@ class ListDiaryActivity : AppCompatActivity() {
         initListener()
         initRecycler()
         loadData()
-        initNewData()
     }
 
-    fun initNewData(){
-        // cek ketika intent mengirim extra berupa model/data (dari form)
-        if( intent?.extras?.getSerializable("model") != null){
-            // ambil data dari intent lalu load di model sebagau listdiarymodel
-            val model = intent?.extras?.getSerializable("model") as ListDiaryModel
-            lists.add(model)        // tambahkan list ke model
-            rvListDiary.adapter?.notifyDataSetChanged()     // beri taukan kepada recyclerview adapter kalau ada perubahan data
-        }
-    }
-
-
-    fun initToolbar(){
+    fun initToolbar() {
         // set support action bar dengan toolbar pada layout
         setSupportActionBar(toolbar)
         supportActionBar?.title = ""
     }
 
-    fun initListener(){
+    fun initListener() {
         // set tombol fab ketika di klik
         fab.setOnClickListener {
             // jalankan intent ke Form Diary Activity
             val intent = Intent(this@ListDiaryActivity, FormDiaryActivity::class.java)
-            intent.putExtra("isEdit", false) // tambahkan extra kalau form berupa create (isEdit = false)
+            intent.putExtra(
+                "isEdit",
+                false
+            ) // tambahkan extra kalau form berupa create (isEdit = false)
             startActivity(intent) // jalankan actvity
         }
     }
@@ -55,37 +49,42 @@ class ListDiaryActivity : AppCompatActivity() {
     // buat variable untuk daftar data yang akan ditampilkan
     val lists = arrayListOf<ListDiaryModel>()
 
-    fun initRecycler(){
+    fun initRecycler() {
         // inisialisasi list recycler
-        rvListDiary.adapter = ListDiaryAdapter(lists)   // buat adapter untuk recylerview berdasarka ListDiaryAdapter
+        rvListDiary.adapter =
+            ListDiaryAdapter(lists)   // buat adapter untuk recylerview berdasarka ListDiaryAdapter
         // tampilkan isi recyclerview menjadi vertical
-        rvListDiary.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL,false)
+        rvListDiary.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
     }
 
-    fun loadData(){
-        // tambahkan data dummy ke dalam list
-        lists.add(
-            ListDiaryModel(
-                "","paradise","10 jun 2020","https://i.ibb.co/y8XHwYS/island.png"
-            )
-        )
-        lists.add(ListDiaryModel(
-            "","paradise2","10 jun 2020","https://i.ibb.co/y8XHwYS/island.png"
-        ))
-        lists.add(ListDiaryModel(
-            "","paradise3","10 jun 2020","https://i.ibb.co/y8XHwYS/island.png"
-        ))
-        lists.add(ListDiaryModel(
-            "","paradise4","10 jun 2020","https://i.ibb.co/y8XHwYS/island.png"
-        ))
-        lists.add(
-            ListDiaryModel(
-                "", "paradise5", "10 jun 2020", "https://i.ibb.co/y8XHwYS/island.png"
-            )
-        )
+    fun loadData() {
+        val db = FirebaseFirestore.getInstance()
+        val docRef = db.collection("diarys")
+        docRef.addSnapshotListener { snapshot, e ->
+            if (e != null) {
+                Log.w("LoadData", "Listen failed.")
+                return@addSnapshotListener
+            }
 
-        // beritaukan jika isi list berubah
-        rvListDiary.adapter?.notifyDataSetChanged()
+            if (snapshot != null && !snapshot.isEmpty) {
+                lists.clear()
+                for (document in snapshot.documents) {
+                    val data = document.toObject(DiaryDao::class.java)
+                    lists.add(
+                        ListDiaryModel(
+                            document.id,
+                            data?.title ?: "",
+                            data?.date.toString(),
+                            data?.url ?: "",
+                            data?.story ?: ""
+                        )
+                    )
+                }
+                rvListDiary.adapter?.notifyDataSetChanged()
+            } else {
+                Toast.makeText(this,"Load Data Failed",Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }
 

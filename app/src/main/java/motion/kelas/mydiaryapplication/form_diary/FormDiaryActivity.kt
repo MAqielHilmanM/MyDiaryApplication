@@ -1,20 +1,27 @@
 package motion.kelas.mydiaryapplication.form_diary
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_form_diary.*
 import motion.kelas.mydiaryapplication.R
+import motion.kelas.mydiaryapplication.dao.DiaryDao
 import motion.kelas.mydiaryapplication.detail_diary.DetailDiaryActivity
 import motion.kelas.mydiaryapplication.list_diary.ListDiaryActivity
 import motion.kelas.mydiaryapplication.list_diary.ListDiaryModel
 import motion.kelas.mydiaryapplication.load
 
+
 class FormDiaryActivity : AppCompatActivity() {
 
     // variable untuk mengecek apakah edit atau bukan (default nilainya false)
     var isEdit = false
+    lateinit var model : ListDiaryModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,26 +39,36 @@ class FormDiaryActivity : AppCompatActivity() {
         btnDiaryNotes.setOnClickListener {
 
             // Buat model berdasarkan data dari form
-            val data = ListDiaryModel(
-                "",
+            val data = DiaryDao(
+                model.id,
+                Timestamp.now(),
+                etCreateDiaryDescription.text.toString(),
                 etCreateDiaryTitle.text.toString(),
-                "10 AUG 2020",
-                "https://i.ibb.co/y8XHwYS/island.png",
-                etCreateDiaryDescription.text.toString()
+                model.url
             )
+
+            val db = FirebaseFirestore.getInstance()
 
             // jika form tersebut edit
             if (isEdit) {
-                //berpindah ke Activity Detail Diary
-                val intent = Intent(this, DetailDiaryActivity::class.java)
-                intent.putExtra("model", data) // kirim data ke activity baru
-                startActivity(intent)
-                finish()
+                db.collection("diarys").document(model.id)
+                    .set(data).addOnSuccessListener {
+                        //berpindah ke Activity Detail Diary
+                        val intent = Intent(this, DetailDiaryActivity::class.java)
+                        intent.putExtra("id",model.id)
+                        startActivity(intent)
+                        finish()
+                    }.addOnFailureListener {
+                        Toast.makeText(this,"Failed change data",Toast.LENGTH_SHORT).show()
+                    }
+
             }else {
-                //berpindah ke Activity List Diary
-                val intent = Intent(this, ListDiaryActivity::class.java)
-                intent.putExtra("model", data) // kirim data ke activity baru
-                startActivity(intent)
+                val docRec = db.collection("diarys")
+                docRec.add(data).addOnSuccessListener {
+                    finish()
+                }.addOnFailureListener {
+                    Toast.makeText(this,"Failed add data",Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
@@ -73,7 +90,7 @@ class FormDiaryActivity : AppCompatActivity() {
             llCreateDiaryCover.visibility = View.GONE
             rlCreateDiaryCover.visibility = View.VISIBLE
 
-            val model = intent.extras?.getSerializable("model") as ListDiaryModel
+            model = intent.extras?.getSerializable("model") as ListDiaryModel
             etCreateDiaryTitle.setText(model.title)
             etCreateDiaryDescription.setText(model.story)
             ivCreateDiaryEdit.load(model.url)

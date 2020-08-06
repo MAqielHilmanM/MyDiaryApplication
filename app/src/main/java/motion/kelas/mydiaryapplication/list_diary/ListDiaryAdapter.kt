@@ -30,11 +30,7 @@ class ListDiaryAdapter(var list: List<ListDiaryModel>) :
             itemView.setOnClickListener {
                 // pindah ke activity detail diary
                 val intent = Intent(context, DetailDiaryActivity::class.java)
-//                intent.putExtra("title",data.title)
-//                intent.putExtra("date",data.date)
-//                intent.putExtra("story",data.story)
-//                intent.putExtra("url",data.url)
-                intent.putExtra("model",data)       // kirimkan data model ke detail diary
+                intent.putExtra("id", data.id)
                 context.startActivity(intent)              // pindah ke activity baru
             }
 

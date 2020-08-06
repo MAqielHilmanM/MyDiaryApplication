@@ -2,20 +2,32 @@ package motion.kelas.mydiaryapplication.detail_diary
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_detail_diary.*
+import kotlinx.android.synthetic.main.activity_detail_diary.toolbar
+import kotlinx.android.synthetic.main.activity_form_diary.*
 import motion.kelas.mydiaryapplication.R
+import motion.kelas.mydiaryapplication.dao.DiaryDao
 import motion.kelas.mydiaryapplication.form_diary.FormDiaryActivity
 import motion.kelas.mydiaryapplication.list_diary.ListDiaryModel
 import motion.kelas.mydiaryapplication.load
 
+
 class DetailDiaryActivity : AppCompatActivity() {
 
     // membuat property/variable global yang akan di inisialisasi nanti
-    lateinit var model: ListDiaryModel
+    lateinit var id: String
+    lateinit var title: String
+    lateinit var date: String
+    lateinit var datetime: Timestamp
+    lateinit var url: String
+    lateinit var story: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +50,9 @@ class DetailDiaryActivity : AppCompatActivity() {
             R.id.menuEdit -> {      // Ketika menuEdit di klik (sesuai dgn id di res/menu/menu_detail.xml)
                 val intent = Intent(this, FormDiaryActivity::class.java)
                 intent.putExtra("isEdit", true) // mengirim extra kalau ini tujuannya untuk edit
-                intent.putExtra("model", model) // mengirim isi data ke form
+                intent.putExtra("model", ListDiaryModel(
+                    id, title, date, url, story
+                )) // mengirim isi data ke form
                 startActivity(intent) // mulai berpindah activity
                 return true
             }
@@ -49,7 +63,16 @@ class DetailDiaryActivity : AppCompatActivity() {
                 builder.setMessage("Are you sure to delete this diary?")    // set pesan dari dialog
                 builder.setPositiveButton("OK") { dialog, which ->
                     // aksi ketika tombol ok di klik
-                    finish()
+
+                    val db = FirebaseFirestore.getInstance()
+                    db.collection("diarys").document("DC")
+                        .delete()
+                        .addOnSuccessListener {
+                            finish()
+                        }
+                        .addOnFailureListener {
+                                e -> Log.w("Error", "Error deleting document", e)
+                        }
                 }
                 builder.setNegativeButton("Cancel") { dialog, which ->
                     // aksi ketika tombol cancel di klik
@@ -80,23 +103,33 @@ class DetailDiaryActivity : AppCompatActivity() {
 
     fun loadData() {
         // Cara mengambil extra dari intent
-//        val title = intent?.extras?.getString("title","")
-//        val date = intent?.extras?.getString("date","")
-//        val url = intent?.extras?.getString("url","")
-//        val story = intent?.extras?.getString("story","")
+        id = intent?.extras?.getString("id","")?:""
 
-        // ambil data/model serializable dari intent extra
-        model = intent?.extras?.getSerializable("model") as ListDiaryModel
-        // pindahkan data dari model ke variable title,date,url, dan story
-        val title = model.title
-        val date = model.date
-        val url = model.url
-        val story = model.story
+        if(id?.isNotEmpty() == true){
+            val db = FirebaseFirestore.getInstance()
+            db.collection("diarys").document(id).addSnapshotListener { snapshot, error ->
+                if(snapshot == null){
+                    return@addSnapshotListener
+                }
 
-        // tampilkan data tersebut ke tampilan (idTextView).text = data
-        tvDetailDiaryDate.text = date
-        tvDetailDiaryTitle.text = title
-        tvDetailDiaryDescription.text = story
-        ivDetailDiary.load(url!!) // gunakan load pada extension untuk load gambar
+                if(snapshot != null && snapshot.exists()){
+                    val model = snapshot.toObject(DiaryDao::class.java)
+
+                    // pindahkan data dari model ke variable title,date,url, dan story
+                    title = model?.title?: ""
+                    date = model?.date?.toDate().toString()?:""
+                    url = model?.url?:""
+                    story = model?.story?:""
+                    datetime = model?.date?: Timestamp.now()
+
+                    // tampilkan data tersebut ke tampilan (idTextView).text = data
+                    tvDetailDiaryDate.text = date
+                    tvDetailDiaryTitle.text = title
+                    tvDetailDiaryDescription.text = story
+                    ivDetailDiary.load(url!!) // gunakan load pada extension untuk load gambar
+                }
+            }
+        }
+
     }
 }
