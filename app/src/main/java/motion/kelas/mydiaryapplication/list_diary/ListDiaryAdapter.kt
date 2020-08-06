@@ -24,7 +24,7 @@ class ListDiaryAdapter(var list: List<ListDiaryModel>) :
             itemView.tvItemListDiaryDate.text = data.date
 
             // untuk file gambar dapat menggunakan picasso
-            Picasso.get().load(data.url).centerCrop().into(itemView.ivItemListDiary)
+            Picasso.get().load(data.url).into(itemView.ivItemListDiary)
 
             // tambahkan aksi ketika item/layout di klik
             itemView.setOnClickListener {

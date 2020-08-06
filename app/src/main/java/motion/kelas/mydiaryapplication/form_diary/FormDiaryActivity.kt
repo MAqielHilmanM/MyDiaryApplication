@@ -59,6 +59,7 @@ class FormDiaryActivity : AppCompatActivity() {
     fun initToolbar() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = ""
         toolbar.setNavigationOnClickListener {
             finish() // menghancurkan aktivitas
         }

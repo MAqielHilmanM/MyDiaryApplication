@@ -39,6 +39,7 @@ class ListDiaryActivity : AppCompatActivity() {
     fun initToolbar(){
         // set support action bar dengan toolbar pada layout
         setSupportActionBar(toolbar)
+        supportActionBar?.title = ""
     }
 
     fun initListener(){

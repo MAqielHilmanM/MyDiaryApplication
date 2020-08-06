@@ -75,6 +75,7 @@ class DetailDiaryActivity : AppCompatActivity() {
         toolbar.setNavigationOnClickListener {
             finish() // menghancurkan aktivitas
         }
+        supportActionBar?.title = ""
     }
 
     fun loadData() {
